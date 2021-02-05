@@ -6,22 +6,32 @@
 #include <stdlib.h>
 #include <time.h>
 
-#define data_size 30000
+#define data_size 10
 
 
 #define COUNT 10
 
 struct node {
-    int key;
+    int data;
     struct node *left, *right;
+    int height;
 };
+
+
+struct node_avl{
+    int data;
+    struct node_avl *left;
+    struct node_avl *right;
+    int depth;
+};
+
 
 // A utility function to create a new BST node
 struct node* newNode(int item)
 {
     struct node* temp
             = (struct node*)malloc(sizeof(struct node));
-    temp->key = item;
+    temp->data = item;
     temp->left = temp->right = NULL;
     return temp;
 }
@@ -37,9 +47,9 @@ struct node* insert(struct node* node, int key)
         return newNode(key);
 
     /* Otherwise, recur down the tree */
-    if (key < node->key)
+    if (key < node->data)
         node->left = insert(node->left, key);
-    else if (key > node->key)
+    else if (key > node->data)
         node->right = insert(node->right, key);
 
     /* return the (unchanged) node pointer */
@@ -63,7 +73,7 @@ void print2DUtil(struct node *root, int space)
     printf("\n");
     for (int i = COUNT; i < space; i++)
         printf(" ");
-    printf("%d\n", root->key);
+    printf("%d\n", root->data);
 
     // Process left child
     print2DUtil(root->left, space);
@@ -94,13 +104,13 @@ void shuffle(int *array, size_t n)
 void search(struct node* root, int data){
     struct node *current = root;
 
-    while(current->key != data){
+    while(current->data != data){
 
         if(current != NULL) {
             //printf("%d ",current->key);
 
             //go to left tree
-            if(current->key > data){
+            if(current->data > data){
                 current = current->left;
             }  //else go to right tree
             else {
@@ -119,11 +129,30 @@ void search(struct node* root, int data){
     //return current;
 }
 
+struct node * new_node(int val){
+    struct node* temp = (struct node*)malloc(sizeof (struct node));
+    temp->data = val;
+    temp->left = NULL;
+    temp->right = NULL;
+
+    temp->height = 1;
+
+    return temp;
+}
+
+struct node * insert_avl(struct node *r, int val){
+    if(r == NULL){
+        return new_node(val);
+    }
+    if (val < r->data){
+        r->left = insert(r->left, val);
+    }
+}
 
 // Driver Code
 int main()
 {
-
+    /*
     int array[data_size];
 
     for(int i =0; i < data_size; i++){
@@ -196,6 +225,24 @@ int main()
 
      printf("Root2 took %f seconds to execute \n", time_taken2);
 
+
+    //struct node *root = NULL;
+    print2D(root);
+    for(int i = 0; i < 10; i++){
+        printf("\n");
+    }
+    print2D(root2);
+
+    */
+
+    struct node *root = NULL;
+
+    root = insert_avl(root, 10);
+    root = insert_avl(root, 20);
+    root = insert_avl(root, 30);
+    root = insert_avl(root, 40);
+    root = insert_avl(root, 50);
+    root = insert_avl(root, 25);
 
     return 0;
 }
