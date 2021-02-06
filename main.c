@@ -339,12 +339,12 @@ int main()
     root = insert(root, 30);
     root = insert(root, 40);
     root = insert(root, 50);
-    for (int a = 0; a < 1000; a++){
+    for (int a = 0; a < 1000000000; a++){
 
         root = insert(root, a);
     }
 
-    print2D(root);
-    search(root, 0);
+    //print2D(root);
+    search(root, 9000000);
     return 0;
 }
