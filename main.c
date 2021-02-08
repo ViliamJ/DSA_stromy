@@ -5,6 +5,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include "myhashmap.c"
+
 
 #define data_size 10
 
@@ -339,12 +341,14 @@ int main()
     root = insert(root, 30);
     root = insert(root, 40);
     root = insert(root, 50);
-    for (int a = 0; a < 1000000000; a++){
+    for (int a = 0; a < 10; a++){
 
         root = insert(root, a);
     }
 
-    //print2D(root);
-    search(root, 9000000);
+    print2D(root);
+    //search(root, 9000000);
+
     return 0;
 }
+
