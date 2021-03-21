@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include "myhashmap.c"
+#include "avl_tree.c"
 
 
 #define data_size 10
@@ -119,8 +120,6 @@ void search(struct Node *root, int data) {
         }
     }
 
-    printf("Data: %d , hladane cislo: %d, Height : %d", current->key, data, current->height);
-    //return current;
 }
 
 
@@ -245,39 +244,45 @@ struct Node *insert(struct Node *node, int key) {
 // Driver Code
 int main() {
 
+    /*
     int array[data_size];
+
+    test1();
 
     for (int i = 0; i < data_size; i++) {
         array[i] = i;
     }
-    /*
-    printf("%llu size", sizeof(struct node));
+
+    printf("%u size", sizeof(struct node));
 
     shuffle(array, data_size);
 
     printf("\n");
 
     struct node* root_normal = NULL;
+    struct Node* avl_root = NULL;
 
 
-    for (int i = 10; i < 50; i+=10 ){
+    for (int i = 10; i < 500000; i+=10 ){
         root_normal = insert2(root_normal, i);
+        avl_root = insert(avl_root, i);
     }
 
     root_normal = insert2(root_normal, 25);
+    avl_root = insert(avl_root, 25);
+
+
+  //  print2D(root_normal);
+  //  print2D(avl_root);
 
 
 
-    print2D(root_normal);
-
-    */
 
 
-    /*
      clock_t t;
      t = clock();
 
-     for(int i = 0; i < data_size; i++){
+     for(int i = 10; i < 500000; i+=10 ){
          search(root_normal, i);
      }
 
@@ -288,19 +293,20 @@ int main() {
 
 
      clock_t t2;
-     t = clock();
+     t2 = clock();
 
-     for(int i = 0; i < data_size; i++){
+     for(int i = 10; i < 500000; i+=10 ){
 
-         search(root2, i);
+         search(avl_root, i);
      }
 
-     t = clock() - t;
-     double time_taken2 = ((double)t)/CLOCKS_PER_SEC; // in seconds
+     t2 = clock() - t2;
+     double time_taken2 = ((double)t2)/CLOCKS_PER_SEC; // in seconds
 
      printf("Root2 took %f seconds to execute \n", time_taken2);
 
-     */
+
+    */
 
 
     /*
@@ -327,6 +333,9 @@ int main() {
 
     */
 
+
+
+    /*
     struct MyHash *hashArray[100];
 
     struct MyHash *item = (struct MyHash *) malloc(sizeof(struct MyHash));
@@ -345,11 +354,14 @@ int main() {
     insert_hash(12, 44, hashArray, 100);
 
 
+
    // myprint(hashArray);
 
     //search_hash(42, hashArray, 100);
 
     printf("Item hashed %d, %d", hashArray[4]->key, hashArray[4]->data );
+
+     */
 
     return 0;
 }
