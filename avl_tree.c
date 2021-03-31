@@ -1,85 +1,135 @@
 //
 // Created by vilia on 21.03.2021.
 //
+// zdroj https://www.geeksforgeeks.org/avl-tree-set-1-insertion/
 
-void test1(){
-    printf("i love pokemon");
-}
-
-struct TreeNode{
-    struct TreeNode *left_node, *right_node;
-    int data;
+struct Node {
+    int key;
+    struct Node *left;
+    struct Node *right;
+    int height;
 };
 
-int get_node_height( struct TreeNode *node ) {
-    int height_left = 0;
-    int height_right = 0;
 
-    if( node->left_node ) {
-        height_left = get_node_height( node->left_node );
-    }
-    if( node->right_node ){
-        height_right = get_node_height( node->right_node );
-    }
+void search(struct Node *root, int data) {
+    struct Node *current = root;
 
-    if (height_right > height_left){
-        return height_right++;
-    } else{
-        return height_left++;
-    }
-}
+    while (current->key != data) {
 
-int search_avl(struct TreeNode *node, int item){
+        if (current != NULL) {
+            //printf("%d ",current->key);
 
-    while (node->data != item){
-        if (node != NULL){
-            if (node->data < item){
-                node = node->right_node;
-            } else{
-                node = node->left_node;
+            //go to left tree
+            if (current->key > data) {
+                current = current->left;
+            }  //else go to right tree
+            else {
+                current = current->right;
             }
 
-            if (node->data == item){
-                return 1;
+            //not found
+            if (current == NULL) {
+                printf("Nenaslo sa cislo");
+                //return NULL;
             }
-        } else{
-            return 0;
         }
     }
-
-    return 0;
 }
 
-struct TreeNode *create_node(int data){
-    struct TreeNode *node = (struct TreeNode *)
-            malloc(sizeof(struct TreeNode));
-
-    node->data = data;
-    node->left_node = NULL;
-    node->right_node = NULL;
-    return node;
-
+// A utility function to get the height of the tree
+int height(struct Node *N) {
+    if (N == NULL)
+        return 0;
+    return N->height;
 }
 
-struct TreeNode *insert_to_avl(struct TreeNode *root, int new_item){
+// A utility function to get maximum of two integers
+int max(int a, int b) {
+    return (a > b) ? a : b;
+}
 
-    if (root == NULL)
-        return (create_node(new_item));
+/* Helper function that allocates a new node with the given key and
+    NULL left and right pointers. */
+struct Node *newNode(int key) {
+    struct Node *node = (struct Node *)
+            malloc(sizeof(struct Node));
+    node->key = key;
+    node->left = NULL;
+    node->right = NULL;
+    node->height = 1;  // new node is initially added at leaf
+    return (node);
+}
 
-    if (new_item < root->data)
-        root->left_node = insert_to_avl(root->left_node, new_item);
-    else if (new_item > root->data)
-        root->right_node = insert_to_avl(root->right_node, new_item);
-    else
-        return root;
+// A utility function to right rotate subtree rooted with y
+// See the diagram given above.
+struct Node *rightRotate(struct Node *y) {
+    struct Node *x = y->left;
+    struct Node *T2 = x->right;
 
+    // Perform rotation
+    x->right = y;
+    y->left = T2;
 
-    int balance_facort = get_node_height(root->right_node) - get_node_height(root->left_node);
+    // Update heights
+    y->height = max(height(y->left), height(y->right)) + 1;
+    x->height = max(height(x->left), height(x->right)) + 1;
 
-    if (abs(balance_facort) > 1 && new_item < root->left_node->data){
+    // Return new root
+    return x;
+}
 
-    }
+// A utility function to left rotate subtree rooted with x
+// See the diagram given above.
+struct Node *leftRotate(struct Node *x) {
+    struct Node *y = x->right;
+    struct Node *T2 = y->left;
 
+    // Perform rotation
+    y->left = x;
+    x->right = T2;
+
+    //  Update heights
+    x->height = max(height(x->left), height(x->right)) + 1;
+    y->height = max(height(y->left), height(y->right)) + 1;
+
+    // Return new root
+    return y;
+}
+
+// Get Balance factor of node N
+int getBalance(struct Node *N) {
+    if (N == NULL)
+        return 0;
+    return height(N->left) - height(N->right);
+}
+
+// Recursive function to insert a key in the subtree rooted
+// with node and returns the new root of the subtree.
+struct Node *insert(struct Node *node, int key) {
+    /* 1.  Perform the normal BST insertion */
+    if (node == NULL)
+        return (newNode(key));
+
+    if (key < node->key)
+        node->left = insert(node->left, key);
+    else if (key > node->key)
+        node->right = insert(node->right, key);
+    else // Equal keys are not allowed in BST
+        return node;
+
+    /* 2. Update height of this ancestor node */
+    node->height = 1 + max(height(node->left),
+                           height(node->right));
+
+    /* 3. Get the balance factor of this ancestor
+          node to check whether this node became
+          unbalanced */
+    int balance = getBalance(node);
+
+    // If this node becomes unbalanced, then
+    // there are 4 cases
+
+    // Left Left Case
     if (balance > 1 && key < node->left->key)
         return rightRotate(node);
 
@@ -99,6 +149,6 @@ struct TreeNode *insert_to_avl(struct TreeNode *root, int new_item){
         return leftRotate(node);
     }
 
-
-    return root;
+    /* return the (unchanged) node pointer */
+    return node;
 }

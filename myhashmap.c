@@ -7,93 +7,97 @@
 
 #define SIZE 1000000
 
-struct MyHash{
-    int key;
-    int data;
+// metoda linear probing
 
+struct MyHash{
+    int **array;
+    int alloced_size; // velkost array
+    int full; // obsadenost policok
 };
 
-//struct MyHash* hashArray[SIZE];
 
-int hash_function(int key, int size){
+int hash_function(int key, int size){ // najjednoduchsia
     return key % size;
 }
 
-void insert_hash(int key, int data, struct MyHash **array, int size){
+void initialize_hashtable(struct MyHash *hashtable){
+    hashtable->array =(int**)malloc(sizeof(int*) * 4);
+    hashtable->alloced_size = 4;
 
+    memset(hashtable->array,0,sizeof(int*) * hashtable->alloced_size);
 
-
-    struct MyHash *item = (struct MyHash*) malloc(sizeof(struct MyHash));
-    item->data = data;
-    item->key = key;
-
-
-
-
-    //get the hash
-    int hashIndex = hash_function(key, size);
-
-
-
-    while(array[hashIndex] != NULL) {
-        //go to next cell
-        ++hashIndex;
-
-        hashIndex %= size;
-    }
-    printf("wut %d\n", hashIndex);
-    array[hashIndex] = item;
-
-
+    hashtable->full = 0;
 }
 
+void insert_hash(int key,struct MyHash *hashtable){
 
-void myprint(struct MyHash **array){
-    struct MyHash *k;
-    k = array[12];
-    printf("please %d", k->data);
-    int i = 0;
+    int hashIndex = hash_function(key, hashtable->alloced_size);
+    int *item = malloc(sizeof(int));
+    *item = key;
 
 
-    while (1){
-        if(array[i] == NULL){
-            ++i;
+    double ratio = (double )hashtable->full / hashtable->alloced_size ;
+
+    int **temporary;
+
+    int original_size = hashtable->alloced_size;
+
+    if (ratio >= 0.5){ // zvacsenie hash funkcie 2 nasobne
+
+        hashtable->alloced_size *= 2;
+
+        temporary = (int**)malloc(sizeof(int*) * hashtable->alloced_size);
+
+        memset(temporary,0,sizeof(int*) * hashtable->alloced_size);
+
+        for (int i = 0; i < original_size; ++i) {
+            if (hashtable->array[i] != NULL){
+                int new_hash_index = hash_function(*hashtable->array[i], hashtable->alloced_size);
+                printf("new_hash_index %d, item: %d\n", new_hash_index, *hashtable->array[i]);
+
+                while(temporary[new_hash_index] != NULL) {
+                    ++new_hash_index;
+                    new_hash_index %= hashtable->alloced_size;
+                }
+
+                temporary[new_hash_index] = hashtable->array[i];
+            }
         }
-        if(i == 99){
-            break;
-        }
-        printf("array key: %d data: %d \n", array[i]->key, array[i]->data);
-        i++;
+        free(hashtable->array);
+        hashtable->array = temporary;
     }
+
+
+
+    while(hashtable->array[hashIndex] != NULL) {
+        ++hashIndex;
+        hashIndex %= hashtable->alloced_size;
+    }
+
+    hashtable->array[hashIndex] = item;
+    hashtable->full++;
+
+    //printf("hasindex : %d\n", hashIndex);
 }
 
-struct MyHash *search_hash(int key, struct MyHash ** array, int size){
-//get the hash
-    int hashIndex = hash_function(key, size);
+int search_hash(int key, struct MyHash *hashtable){
 
-    printf("jebo %d \n", hashIndex);
-
-    //move in array until an empty
-    while(array[hashIndex] != NULL) {
-
-        //struct MyHash *item = (struct MyHash *) array[0];
-        struct MyHash *item = (struct MyHash*) malloc(sizeof(struct MyHash));
-        item = array[hashIndex];
-
-        printf("juj %d\n", item->key);
+    int hashIndex = hash_function(key, hashtable->alloced_size);
 
 
-        if(item->key == key) {
-            printf("blitzna");
-            return array[hashIndex];
+    while(hashtable->array[hashIndex] != NULL) {
+
+
+        if (key == *hashtable->array[hashIndex]){
+            printf("naslo");
+            return 1;
         }
 
-        //go to next cell
         ++hashIndex;
+        hashIndex %= hashtable->alloced_size;
 
-        //wrap around the table
-        hashIndex %= SIZE;
+
+
     }
-
-    return NULL;
+    return 0;
 }

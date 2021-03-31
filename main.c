@@ -5,56 +5,24 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include "myhashmap.c"
-#include "avl_tree.c"
+#include <string.h>
 
+#include "myhashmap.c"
+#include "red_black.c"
+#include "avl_tree.c"
 
 #define data_size 10
 
 
 #define COUNT 10
 
-struct node {
-    int key;
-    struct node *left, *right;
-    int height;
-};
 
-
-struct Node {
-    int key;
-    struct Node *left;
-    struct Node *right;
-    int height;
-};
 
 // A utility function to create a new BST node
-struct node *newNode1(int item) {
-    struct node *temp
-            = (struct node *) malloc(sizeof(struct node));
-    temp->key = item;
-    temp->left = temp->right = NULL;
-    return temp;
-}
-
 
 /* A utility function to insert
    a new node with given key in
  * BST */
-struct node *insert2(struct node *node, int key) {
-    /* If the tree is empty, return a new node */
-    if (node == NULL)
-        return newNode1(key);
-
-    /* Otherwise, recur down the tree */
-    if (key < node->key)
-        node->left = insert2(node->left, key);
-    else if (key > node->key)
-        node->right = insert2(node->right, key);
-
-    /* return the (unchanged) node pointer */
-    return node;
-}
 
 void print2DUtil(struct Node *root, int space) {
     // Base case
@@ -96,206 +64,43 @@ void shuffle(int *array, size_t n) {
     }
 }
 
-void search(struct Node *root, int data) {
-    struct Node *current = root;
-
-    while (current->key != data) {
-
-        if (current != NULL) {
-            //printf("%d ",current->key);
-
-            //go to left tree
-            if (current->key > data) {
-                current = current->left;
-            }  //else go to right tree
-            else {
-                current = current->right;
-            }
-
-            //not found
-            if (current == NULL) {
-                printf("Nenaslo sa cislo");
-                //return NULL;
-            }
-        }
-    }
-
-}
 
 
-// A utility function to get the height of the tree
-int height(struct Node *N) {
-    if (N == NULL)
-        return 0;
-    return N->height;
-}
 
-// A utility function to get maximum of two integers
-int max(int a, int b) {
-    return (a > b) ? a : b;
-}
 
-/* Helper function that allocates a new node with the given key and
-    NULL left and right pointers. */
-struct Node *newNode(int key) {
-    struct Node *node = (struct Node *)
-            malloc(sizeof(struct Node));
-    node->key = key;
-    node->left = NULL;
-    node->right = NULL;
-    node->height = 1;  // new node is initially added at leaf
-    return (node);
-}
-
-// A utility function to right rotate subtree rooted with y
-// See the diagram given above.
-struct Node *rightRotate(struct Node *y) {
-    struct Node *x = y->left;
-    struct Node *T2 = x->right;
-
-    // Perform rotation
-    x->right = y;
-    y->left = T2;
-
-    // Update heights
-    y->height = max(height(y->left), height(y->right)) + 1;
-    x->height = max(height(x->left), height(x->right)) + 1;
-
-    // Return new root
-    return x;
-}
-
-// A utility function to left rotate subtree rooted with x
-// See the diagram given above.
-struct Node *leftRotate(struct Node *x) {
-    struct Node *y = x->right;
-    struct Node *T2 = y->left;
-
-    // Perform rotation
-    y->left = x;
-    x->right = T2;
-
-    //  Update heights
-    x->height = max(height(x->left), height(x->right)) + 1;
-    y->height = max(height(y->left), height(y->right)) + 1;
-
-    // Return new root
-    return y;
-}
-
-// Get Balance factor of node N
-int getBalance(struct Node *N) {
-    if (N == NULL)
-        return 0;
-    return height(N->left) - height(N->right);
-}
-
-// Recursive function to insert a key in the subtree rooted
-// with node and returns the new root of the subtree.
-struct Node *insert(struct Node *node, int key) {
-    /* 1.  Perform the normal BST insertion */
-    if (node == NULL)
-        return (newNode(key));
-
-    if (key < node->key)
-        node->left = insert(node->left, key);
-    else if (key > node->key)
-        node->right = insert(node->right, key);
-    else // Equal keys are not allowed in BST
-        return node;
-
-    /* 2. Update height of this ancestor node */
-    node->height = 1 + max(height(node->left),
-                           height(node->right));
-
-    /* 3. Get the balance factor of this ancestor
-          node to check whether this node became
-          unbalanced */
-    int balance = getBalance(node);
-
-    // If this node becomes unbalanced, then
-    // there are 4 cases
-
-    // Left Left Case
-    if (balance > 1 && key < node->left->key)
-        return rightRotate(node);
-
-    // Right Right Case
-    if (balance < -1 && key > node->right->key)
-        return leftRotate(node);
-
-    // Left Right Case
-    if (balance > 1 && key > node->left->key) {
-        node->left = leftRotate(node->left);
-        return rightRotate(node);
-    }
-
-    // Right Left Case
-    if (balance < -1 && key < node->right->key) {
-        node->right = rightRotate(node->right);
-        return leftRotate(node);
-    }
-
-    /* return the (unchanged) node pointer */
-    return node;
-}
 
 
 // Driver Code
 int main() {
 
     /*
-    int array[data_size];
 
-    test1();
+    int array[data_size];
 
     for (int i = 0; i < data_size; i++) {
         array[i] = i;
     }
 
-    printf("%u size", sizeof(struct node));
-
     shuffle(array, data_size);
 
-    printf("\n");
 
-    struct node* root_normal = NULL;
+
     struct Node* avl_root = NULL;
 
 
-    for (int i = 10; i < 500000; i+=10 ){
-        root_normal = insert2(root_normal, i);
+    for (int i = 10; i < 100; i+=10 ){
         avl_root = insert(avl_root, i);
     }
 
-    root_normal = insert2(root_normal, 25);
     avl_root = insert(avl_root, 25);
 
 
-  //  print2D(root_normal);
-  //  print2D(avl_root);
-
-
-
-
-
-     clock_t t;
-     t = clock();
-
-     for(int i = 10; i < 500000; i+=10 ){
-         search(root_normal, i);
-     }
-
-     t = clock() - t;
-     double time_taken = ((double)t)/CLOCKS_PER_SEC; // in seconds
-
-     printf("Root1 took %f seconds to execute \n", time_taken);
-
+    print2D(avl_root);
 
      clock_t t2;
      t2 = clock();
 
-     for(int i = 10; i < 500000; i+=10 ){
+     for(int i = 10; i < 100; i+=10 ){
 
          search(avl_root, i);
      }
@@ -306,7 +111,7 @@ int main() {
      printf("Root2 took %f seconds to execute \n", time_taken2);
 
 
-    */
+
 
 
     /*
@@ -331,11 +136,6 @@ int main() {
     //print2D(root);
     //search(root, 9000000);
 
-    */
-
-
-
-    /*
     struct MyHash *hashArray[100];
 
     struct MyHash *item = (struct MyHash *) malloc(sizeof(struct MyHash));
@@ -361,7 +161,42 @@ int main() {
 
     printf("Item hashed %d, %d", hashArray[4]->key, hashArray[4]->data );
 
+
+    struct node* redblack = NULL;
+
+
+    for (int i = 0; i < 100; ++i)
+        insert_redblack(&redblack, i);
+
+    tree_print(redblack);
+
      */
+    struct MyHash table;
+    initialize_hashtable(&table);
+
+
+    insert_hash(1, &table);
+    insert_hash(2, &table);
+    insert_hash(4, &table);
+    insert_hash(9, &table);
+    insert_hash(22, &table);
+    insert_hash(11, &table);
+
+
+    search_hash(11,&table);
+
+    // pri hastabulke nasobky 2
+    //
+
+
+
+    for (int i = 0; i < table.alloced_size; ++i) {
+        if (table.array[i] == NULL){
+            printf("Index %d prazdny\n", i);
+        } else{
+            printf("index %i item %d\n",i, *(table.array[i]));
+        }
+    }
 
     return 0;
 }
