@@ -8,13 +8,14 @@
 #include <string.h>
 
 #include "myhashmap.c"
-#include "red_black.c"
 #include "avl_tree.c"
+#include "hashtable_chaining.c"
 
 #define data_size 10
 
 
 #define COUNT 10
+
 
 
 
@@ -171,30 +172,30 @@ int main() {
     tree_print(redblack);
 
      */
-    struct MyHash table;
-    initialize_hashtable(&table);
+    struct MyHash table_probing;
+    initialize_hashtable(&table_probing,4000,0);
 
 
-    insert_hash(1, &table);
-    insert_hash(2, &table);
-    insert_hash(4, &table);
-    insert_hash(9, &table);
-    insert_hash(22, &table);
-    insert_hash(11, &table);
 
 
-    search_hash(11,&table);
+
+    insert_hash(43, &table_probing);
+    insert_hash(22, &table_probing);
+    insert_hash(22, &table_probing);
+    insert_hash(22, &table_probing);
+    insert_hash(22, &table_probing);
+
 
     // pri hastabulke nasobky 2
     //
 
 
 
-    for (int i = 0; i < table.alloced_size; ++i) {
-        if (table.array[i] == NULL){
+    for (int i = 0; i < table_probing.alloced_size; ++i) {
+        if (table_probing.array[i] == NULL){
             printf("Index %d prazdny\n", i);
         } else{
-            printf("index %i item %d\n",i, *(table.array[i]));
+            printf("index %i item %d\n",i, *(table_probing.array[i]));
         }
     }
 
