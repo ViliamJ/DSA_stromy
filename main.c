@@ -191,6 +191,8 @@ int main() {
 
 
 
+
+
     for (int i = 0; i < table_probing.alloced_size; ++i) {
         if (table_probing.array[i] == NULL){
             printf("Index %d prazdny\n", i);
@@ -199,6 +201,27 @@ int main() {
         }
     }
 
+
+
+
+    init_chain();
+
+    insert_chain_hash(7);
+    insert_chain_hash(0);
+    insert_chain_hash(3);
+    insert_chain_hash(10);
+    insert_chain_hash(4);
+    insert_chain_hash(5);
+
+    if(search_chain(10))
+        printf("Search Found\n");
+    else
+        printf("Search Not Found\n");
+    print_chain();
+
     return 0;
+
+
+
 }
 
