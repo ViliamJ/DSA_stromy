@@ -5,6 +5,7 @@
 
 // https://www.log2base2.com/algorithms/searching/open-hashing.html
 
+int collision_chain = 0;
 
 struct Chain_node
 {
@@ -32,12 +33,14 @@ void insert_chain_hash(int value)
     int key = value % size;
 
     //check if chain[key] is empty
-    if(chain[key] == NULL)
+    if(chain[key] == NULL){
         chain[key] = newNode;
         //collision
+        }
     else
     {
         //add the node at the end of chain[key].
+        collision_chain++;
         struct Chain_node *temp = chain[key];
         while(temp->next)
         {

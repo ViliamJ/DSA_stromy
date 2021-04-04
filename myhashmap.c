@@ -9,7 +9,7 @@
 
 // metoda linear probing
 
-int kolizie_my_hash = 0;
+int collision_my_hash = 0;
 
 struct MyHash{
     int **array;
@@ -78,7 +78,7 @@ void insert_hash(int key,struct MyHash *hashtable){
 
     while(hashtable->array[hashIndex] != NULL) {
         printf("LOLOLOLOLOLOLOLOLOL kolizia\n");
-        kolizie_my_hash ++;
+        collision_my_hash ++;
         ++hashIndex;
         hashIndex %= hashtable->alloced_size;
     }

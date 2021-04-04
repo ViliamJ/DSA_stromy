@@ -206,12 +206,11 @@ int main() {
 
     init_chain();
 
-    insert_chain_hash(7);
+
     insert_chain_hash(0);
     insert_chain_hash(3);
     insert_chain_hash(10);
-    insert_chain_hash(4);
-    insert_chain_hash(5);
+
 
     if(search_chain(10))
         printf("Search Found\n");
@@ -219,7 +218,9 @@ int main() {
         printf("Search Not Found\n");
     print_chain();
 
+    printf("collision chain: %d, collision my hash : %d", collision_chain, collision_my_hash);
     return 0;
+
 
 
 
