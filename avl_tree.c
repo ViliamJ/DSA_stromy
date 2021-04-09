@@ -1,7 +1,4 @@
-//
-// Created by vilia on 21.03.2021.
-//
-// zdroj https://www.geeksforgeeks.org/avl-tree-set-1-insertion/
+// zdroj pre AVL strom https://www.geeksforgeeks.org/avl-tree-set-1-insertion/
 
 struct Node {
     int key;
@@ -10,6 +7,7 @@ struct Node {
     int height;
 };
 
+int avl_rotation = 0; // pocitadlo rotacii
 
 void search(struct Node *root, int data) {
     struct Node *current = root;
@@ -17,7 +15,6 @@ void search(struct Node *root, int data) {
     while (current->key != data) {
 
         if (current != NULL) {
-            //printf("%d ",current->key);
 
             //go to left tree
             if (current->key > data) {
@@ -29,8 +26,7 @@ void search(struct Node *root, int data) {
 
             //not found
             if (current == NULL) {
-                printf("Nenaslo sa cislo");
-                //return NULL;
+                printf("Nenaslo sa hladane cislo %d v AVL", current->key);
             }
         }
     }
@@ -75,6 +71,7 @@ struct Node *rightRotate(struct Node *y) {
     x->height = max(height(x->left), height(x->right)) + 1;
 
     // Return new root
+    avl_rotation++;
     return x;
 }
 
@@ -93,6 +90,7 @@ struct Node *leftRotate(struct Node *x) {
     y->height = max(height(y->left), height(y->right)) + 1;
 
     // Return new root
+    avl_rotation++;
     return y;
 }
 

@@ -1,29 +1,23 @@
-//
-// Created by Viliam on 08.02.2021.
-//
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
 
-#define SIZE 1000000
-
-// metoda linear probing
+// vlastna metoda linear probing
 
 int collision_my_hash = 0;
 
 struct MyHash{
-    int **array;
+    int **array; // pole v ktorom sa budu nachadzat data typu (int*)
     int alloced_size; // velkost array
     int full; // obsadenost policok
-    int bool_resize;
+    int bool_resize; // boolean ci sa ma alebo nema spustit zvacsovanie tabulky
 };
 
 
-int hash_function(int key, int size){ // najjednoduchsia
+int hash_function(int key, int size){ // hashovacia funkcia
     return key % size;
 }
 
-void initialize_hashtable(struct MyHash *hashtable, int initial, int bool_resize){
+void initialize_hashtable(struct MyHash *hashtable, int initial, int bool_resize){ // inicializacia tabulky vopred
     hashtable->array =(int**)malloc(sizeof(int*) * initial);
     hashtable->alloced_size = initial;
 
@@ -46,19 +40,19 @@ void insert_hash(int key,struct MyHash *hashtable){
 
     int original_size = hashtable->alloced_size;
 
-    if (hashtable->bool_resize == 1){
+    if (hashtable->bool_resize == 1){ // zvacsovanie tabulky
         if (ratio >= 0.5){ // zvacsenie hash funkcie 2 nasobne
 
             hashtable->alloced_size *= 2;
 
-            temporary = (int**)malloc(sizeof(int*) * hashtable->alloced_size);
+            temporary = (int**)malloc(sizeof(int*) * hashtable->alloced_size); // temporary predstavuje pole v ktorom docasne budu ulozene hodnoty z novo preheshovanej tabulky
 
             memset(temporary,0,sizeof(int*) * hashtable->alloced_size);
 
             for (int i = 0; i < original_size; ++i) { // znovu prehashovanie zvacsenej tabulky
                 if (hashtable->array[i] != NULL){
                     int new_hash_index = hash_function(*hashtable->array[i], hashtable->alloced_size);
-                    printf("new_hash_index %d, item: %d\n", new_hash_index, *hashtable->array[i]);
+                    //printf("new_hash_index %d, item: %d\n", new_hash_index, *hashtable->array[i]);
 
                     while(temporary[new_hash_index] != NULL) {
                         ++new_hash_index;
@@ -68,22 +62,27 @@ void insert_hash(int key,struct MyHash *hashtable){
                     temporary[new_hash_index] = hashtable->array[i];
                 }
             }
-            free(hashtable->array);
+            free(hashtable->array); // uvolnenie povodnej
             hashtable->array = temporary;
         }
     }
 
-
-
+    int hash_code1 = hashIndex;
 
     while(hashtable->array[hashIndex] != NULL) {
-        printf("LOLOLOLOLOLOLOLOLOL kolizia\n");
-        collision_my_hash ++;
+
         ++hashIndex;
         hashIndex %= hashtable->alloced_size;
     }
 
+    int hash_code2 = hashIndex;
+
+    if (hash_code1 != hash_code2){ // pocitadlo kolizii
+        collision_my_hash++;
+    }
+
     hashtable->array[hashIndex] = item;
+
     hashtable->full++;
 
     //printf("hasindex : %d\n", hashIndex);
@@ -98,15 +97,11 @@ int search_hash(int key, struct MyHash *hashtable){
 
 
         if (key == *hashtable->array[hashIndex]){
-            printf("naslo\n");
             return 1;
         }
 
         ++hashIndex;
         hashIndex %= hashtable->alloced_size;
-
-
-
     }
     return 0;
 }

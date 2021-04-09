@@ -1,9 +1,9 @@
 #include<stdio.h>
 #include<stdlib.h>
 
-#define size 7
+#define size 200000000
 
-// https://www.log2base2.com/algorithms/searching/open-hashing.html
+//zdroj pre chaining hashtable https://www.log2base2.com/algorithms/searching/open-hashing.html
 
 int collision_chain = 0;
 

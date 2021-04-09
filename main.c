@@ -1,7 +1,3 @@
-
-// C program to demonstrate insert
-// operation in binary
-// search tree.
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -11,19 +7,8 @@
 #include "avl_tree.c"
 #include "hashtable_chaining.c"
 
-#define data_size 10
-
-
 #define COUNT 10
 
-
-
-
-// A utility function to create a new BST node
-
-/* A utility function to insert
-   a new node with given key in
- * BST */
 
 void print2DUtil(struct Node *root, int space) {
     // Base case
@@ -53,6 +38,14 @@ void print2D(struct Node *root) {
     print2DUtil(root, 0);
 }
 
+void free_avl_tree(struct Node * node){
+    if (node != NULL) {
+        free_avl_tree(node->right);
+        free_avl_tree(node->left);
+        free(node);
+    }
+}
+
 void shuffle(int *array, size_t n) {
     if (n > 1) {
         size_t i;
@@ -67,162 +60,273 @@ void shuffle(int *array, size_t n) {
 
 
 
+void timer_detection(void (*f)(int, int, int, int), char  *func_name, int a, int b, int table_size, int choice)
+{
 
+    clock_t t2;
+    t2 = clock();
 
+    (*f)(a,b, table_size,choice);
 
+    t2 = clock() - t2;
+    double time_taken2 = ((double)t2)/CLOCKS_PER_SEC; // in seconds
 
-// Driver Code
-int main() {
+    printf("Function (%s) took %f seconds to execute \n",func_name, time_taken2);
 
-    /*
+    printf("collision my hash: %d |  collision chain: %d | avl_rotation: %d \n", collision_my_hash, collision_chain, avl_rotation);
 
-    int array[data_size];
+    collision_chain = 0;
+    collision_my_hash = 0;
+    avl_rotation = 0;
+}
 
-    for (int i = 0; i < data_size; i++) {
-        array[i] = i;
+void test_sorted_nonrandom(int a, int b, int table_size, int choice){ // je nutne pozmenit manualne velkost tabulky v prevzatej hash table chaining
+    struct MyHash table_probing;
+    initialize_hashtable(&table_probing, table_size, 0); // myhashmap linear probing
+    init_chain(); // chaining hashmap
+    struct Node* avl_root = NULL; // AVL tree root init
+
+    printf("Testing numbers from %d to %d, hashtable size %d\n", a, b, table_size);
+
+    if (choice == 1){
+        printf("1. Testing my hashtable linear probing \n");
     }
 
-    shuffle(array, data_size);
+    if (choice == 2){
+        printf("2. Testing chaining table \n");
+    }
+
+    if (choice == 3){
+        printf("3. Testing AVL tree \n");
+    }
+
+    clock_t t1;
+    t1 = clock();
+
+    for (int i = a; i < b; i++) {
+        if (choice == 1){
+            insert_hash(i, &table_probing);
+        }
+
+        if (choice == 2){
+            insert_chain_hash(i);
+        }
+        if (choice == 3){
+            avl_root = insert(avl_root, i);
+        }
+    }
+
+    t1 = clock() - t1;
+    double time_taken1 = ((double)t1)/CLOCKS_PER_SEC; // in seconds
+    printf("Sorted insert took: %f\n", time_taken1);
 
 
+    clock_t t2;
+    t2 = clock();
+
+    for (int i = a; i < b; i++) {
+        if (choice == 1){
+            if (search_hash(i, &table_probing) == 0)
+                printf("nenaslo cislo %d", i);
+        }
+
+        if (choice == 2){
+            if (search_chain(i) == 0)
+                printf("nenaslo cislo %d", i);
+        }
+
+        if (choice == 3){
+            search(avl_root, i);
+        }
+    }
+
+    t2 = clock() - t2;
+    double time_taken2 = ((double)t2)/CLOCKS_PER_SEC; // in seconds
+    printf("Sorted search took: %f\n", time_taken2);
+}
+
+
+void kolizie_rotatice_random(int table_size){ // otestovanie kolizii aj časov, ( v chain hastable, treba tabulku manualne pozmenit velkost na dany table_size )
+    int array[table_size];
+
+
+    for (int i = 0; i < table_size; i++) {
+        array[i] = rand();
+    }
+
+
+
+    struct MyHash table_probing;
+    initialize_hashtable(&table_probing, table_size, 0);
 
     struct Node* avl_root = NULL;
+    init_chain();
 
+    //1.  test INSERT my hash
+    clock_t t1;
+    t1 = clock();
 
-    for (int i = 10; i < 100; i+=10 ){
-        avl_root = insert(avl_root, i);
+    for (int i = 0; i < table_size; i++) {
+        insert_hash(array[i], &table_probing);
+        //insert_chain_hash(array[i]);
+        //avl_root = insert(avl_root, array[i]);
     }
 
-    avl_root = insert(avl_root, 25);
+    t1 = clock() - t1;
+    double time_taken1 = ((double)t1)/CLOCKS_PER_SEC; // in seconds
+    printf("Myhast insert took: %f\n", time_taken1);
 
-
-    print2D(avl_root);
-
-     clock_t t2;
-     t2 = clock();
-
-     for(int i = 10; i < 100; i+=10 ){
-
-         search(avl_root, i);
-     }
-
-     t2 = clock() - t2;
-     double time_taken2 = ((double)t2)/CLOCKS_PER_SEC; // in seconds
-
-     printf("Root2 took %f seconds to execute \n", time_taken2);
-
-
-
-
-
-    /*
-    for(int i = 0; i < 20; i++){
-        printf("\n");
+    // 2. test INSERT chain hash
+    clock_t t3;
+    t3 = clock();
+    for (int i = 0; i < table_size; i++) {
+        //insert_hash(array[i], &table_probing);
+        insert_chain_hash(array[i]);
+        //avl_root = insert(avl_root, array[i]);
     }
 
+    t3 = clock() - t3;
+    double time_taken3 = ((double)t3)/CLOCKS_PER_SEC; // in seconds
+    printf("Chain insert took: %f\n", time_taken3);
 
 
-
-    struct Node *root = NULL;
-
-    root = insert(root, 10);
-    root = insert(root, 20);
-    root = insert(root, 30);
-    root = insert(root, 40);
-    root = insert(root, 50);
-    for (int a = 0; a < 100000000; a++){
-        root = insert(root, a);
+    // 3. test INSERT AVL
+    clock_t t4;
+    t4 = clock();
+    for (int i = 0; i < table_size; i++) {
+        //insert_hash(array[i], &table_probing);
+        //insert_chain_hash(array[i]);
+        avl_root = insert(avl_root, array[i]);
     }
 
-    //print2D(root);
-    //search(root, 9000000);
-
-    struct MyHash *hashArray[100];
-
-    struct MyHash *item = (struct MyHash *) malloc(sizeof(struct MyHash));
-    item->data = 10;
-    item->key = 15;
-
-    hashArray[1] = item;
+    t4 = clock() - t4;
+    double time_taken4 = ((double)t4)/CLOCKS_PER_SEC; // in seconds
+    printf("AVL insert took: %f\n", time_taken4);
 
 
-    insert_hash(1, 70, hashArray, 100);
+    printf("\n");
+    shuffle(array, table_size); // porozhadtujem naplnene pole nahodnych cisel, aby sa tazsie hladali prvky pri search
 
-    insert_hash(2, 20,hashArray, 100);
+    // 4. test SEARCH myHash
+    clock_t t5;
+    t5 = clock();
 
-   // insert_hash(7, 80, hashArray, 100);
-   // insert_hash(4, 25, hashArray, 100);
-    insert_hash(12, 44, hashArray, 100);
+    for (int i = 0; i < table_size; i++) {
+        search_hash(array[i], &table_probing);
+        //search_chain(array[i]);
+        //search(avl_root, array[i]);
+    }
+
+    t5 = clock() - t5;
+    double time_taken5 = ((double)t5)/CLOCKS_PER_SEC; // in seconds
+    printf("Myhash search took: %f\n", time_taken5);
+
+    // 5. test SEARCH chain hash
+    clock_t t6;
+    t6= clock();
+
+    for (int i = 0; i < table_size; i++) {
+        //search_hash(array[i], &table_probing);
+        search_chain(array[i]);
+        //search(avl_root, array[i]);
+    }
+
+    t6 = clock() - t6;
+    double time_taken6 = ((double)t6)/CLOCKS_PER_SEC; // in seconds
+    printf("ChainHash search took: %f\n", time_taken6);
 
 
+    // 6. test SEARCH AVL
+    clock_t t7;
+    t7= clock();
 
-   // myprint(hashArray);
+    for (int i = 0; i < table_size; i++) {
+        //search_hash(array[i], &table_probing);
+        //search_chain(array[i]);
+        search(avl_root, array[i]);
+    }
 
-    //search_hash(42, hashArray, 100);
+    t7 = clock() - t7;
+    double time_taken7 = ((double)t7)/CLOCKS_PER_SEC; // in seconds
+    printf("AVL search took: %f\n", time_taken7);
 
-    printf("Item hashed %d, %d", hashArray[4]->key, hashArray[4]->data );
+    printf("collision my hash: %d |  collision chain: %d | avl_rotation: %d \n", collision_my_hash, collision_chain, avl_rotation);
 
+    collision_chain = 0;
+    collision_my_hash = 0;
+    avl_rotation = 0;
 
-    struct node* redblack = NULL;
+}
 
+void test_my_hashmap_functionality(){
 
-    for (int i = 0; i < 100; ++i)
-        insert_redblack(&redblack, i);
-
-    tree_print(redblack);
-
-     */
     struct MyHash table_probing;
-    initialize_hashtable(&table_probing,4000,0);
+    initialize_hashtable(&table_probing, 10, 0);
 
+    insert_hash(777,&table_probing);
+    insert_hash(456,&table_probing);
+    insert_hash(9512,&table_probing);
+    insert_hash(951215,&table_probing);
+    insert_hash(0,&table_probing);
+    insert_hash(6984,&table_probing);
+    insert_hash(15,&table_probing);
+    insert_hash(11,&table_probing);
+    insert_hash(11,&table_probing);
 
-
-
-
-    insert_hash(43, &table_probing);
-    insert_hash(22, &table_probing);
-    insert_hash(22, &table_probing);
-    insert_hash(22, &table_probing);
-    insert_hash(22, &table_probing);
-
-
-    // pri hastabulke nasobky 2
-    //
-
-
+    if (search_hash(11,&table_probing) == 1)
+        printf("nasiel prvok %d\n", 11);
 
 
 
     for (int i = 0; i < table_probing.alloced_size; ++i) {
-        if (table_probing.array[i] == NULL){
-            printf("Index %d prazdny\n", i);
-        } else{
-            printf("index %i item %d\n",i, *(table_probing.array[i]));
+        if (table_probing.array[i] == NULL) {
+            printf("Index: %d prazdny\n", i);
+        } else {
+            printf("index: %i item: %d\n", i, *(table_probing.array[i]));
         }
     }
+}
+
+int main(int argc, char *argv[]) {
+
+    srand(time(0)); // zabezpečuje aby vždy boli nahodne cisla kazdykrat co sa spusti program
 
 
 
 
-    init_chain();
+
+    //timer_detection(test_sorted_nonrandom,"My hash probing", 0,  1000000, 200000000,1);
+    //timer_detection(test_sorted_nonrandom,"My hash probing", 0,  1000000, 200000000,2);
+    //timer_detection(test_sorted_nonrandom,"My hash probing", 0,  1000000, 200000000,3);
 
 
-    insert_chain_hash(0);
-    insert_chain_hash(3);
-    insert_chain_hash(10);
+    //timer_detection(test_sorted_nonrandom,"My hash probing", 1000000,  10000000, 200000000,1);
+    //timer_detection(test_sorted_nonrandom,"My hash probing", 1000000,  10000000, 200000000,2);
+    //timer_detection(test_sorted_nonrandom,"My hash probing", 1000000,  10000000, 200000000,3);
+
+    //timer_detection(test_sorted_nonrandom,"My hash probing", 0,  200000000, 200000000,1);
+    //timer_detection(test_sorted_nonrandom,"My hash probing", 0,  200000000, 200000000,2);
+    //timer_detection(test_sorted_nonrandom,"My hash probing", 0,  200000000, 200000000,3);
+
+    //timer_detection(test_sorted_nonrandom,"My hash probing", 1000000000,  1200000000, 200000000,1);
+    //timer_detection(test_sorted_nonrandom,"My hash probing", 1000000000,  1200000000, 200000000,2);
+    //timer_detection(test_sorted_nonrandom,"My hash probing", 1000000000,  1200000000, 200000000,3);
+
+    //timer_detection(test_sorted_nonrandom,"My hash probing", 10000000,  100000000, 200000000,1);
+    //timer_detection(test_sorted_nonrandom,"My hash probing", 10000000,  100000000, 200000000,2);
+    //timer_detection(test_sorted_nonrandom,"My hash probing", 10000000,  100000000, 200000000,3);
+
+    //kolizie_rotatice_random(1997);
+    //kolizie_rotatice_random(25000);
+    //kolizie_rotatice_random(50000);
+    kolizie_rotatice_random(100000);
+    //kolizie_rotatice_random(150000);
+    //kolizie_rotatice_random(200000);
+    //kolizie_rotatice_random(250000);
 
 
-    if(search_chain(10))
-        printf("Search Found\n");
-    else
-        printf("Search Not Found\n");
-    print_chain();
-
-    printf("collision chain: %d, collision my hash : %d", collision_chain, collision_my_hash);
+    //test_my_hashmap_functionality();
     return 0;
 
 
-
-
 }
-
