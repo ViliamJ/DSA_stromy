@@ -72,7 +72,12 @@ void insert_hash(int key,struct MyHash *hashtable){
     while(hashtable->array[hashIndex] != NULL) {
 
         ++hashIndex;
-        hashIndex %= hashtable->alloced_size;
+
+        if (hashIndex >= hashtable->alloced_size){
+            hashIndex = 0;
+        }
+
+        //hashIndex %= hashtable->alloced_size;
     }
 
     int hash_code2 = hashIndex;
@@ -101,7 +106,11 @@ int search_hash(int key, struct MyHash *hashtable){
         }
 
         ++hashIndex;
-        hashIndex %= hashtable->alloced_size;
+
+        if (hashIndex >= hashtable->alloced_size){
+            hashIndex = 0;
+        }
+        //hashIndex %= hashtable->alloced_size;
     }
     return 0;
 }

@@ -1,7 +1,7 @@
 #include<stdio.h>
 #include<stdlib.h>
 
-#define size 200000000
+#define size 500051
 
 //zdroj pre chaining hashtable https://www.log2base2.com/algorithms/searching/open-hashing.html
 
@@ -35,8 +35,8 @@ void insert_chain_hash(int value)
     //check if chain[key] is empty
     if(chain[key] == NULL){
         chain[key] = newNode;
-        //collision
-        }
+
+        }//collision
     else
     {
         //add the node at the end of chain[key].

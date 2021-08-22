@@ -146,18 +146,21 @@ void test_sorted_nonrandom(int a, int b, int table_size, int choice){ // je nutn
 }
 
 
-void kolizie_rotatice_random(int table_size){ // otestovanie kolizii aj časov, ( v chain hastable, treba tabulku manualne pozmenit velkost na dany table_size )
+void kolizie_rotatice_random(int table_size, int real_table_size){ // otestovanie kolizii aj časov, ( v chain hastable, treba tabulku manualne pozmenit velkost na dany table_size )
     int array[table_size];
 
 
     for (int i = 0; i < table_size; i++) {
         array[i] = rand();
+        //printf("nahodne cislo :%d\n", array[i]);
     }
 
 
 
+
+
     struct MyHash table_probing;
-    initialize_hashtable(&table_probing, table_size, 0);
+    initialize_hashtable(&table_probing, real_table_size, 0);
 
     struct Node* avl_root = NULL;
     init_chain();
@@ -198,14 +201,14 @@ void kolizie_rotatice_random(int table_size){ // otestovanie kolizii aj časov, 
         //insert_chain_hash(array[i]);
         avl_root = insert(avl_root, array[i]);
     }
-
+//
     t4 = clock() - t4;
     double time_taken4 = ((double)t4)/CLOCKS_PER_SEC; // in seconds
     printf("AVL insert took: %f\n", time_taken4);
 
 
     printf("\n");
-    shuffle(array, table_size); // porozhadtujem naplnene pole nahodnych cisel, aby sa tazsie hladali prvky pri search
+    //shuffle(array, table_size); // porozhadtujem naplnene pole nahodnych cisel, aby sa tazsie hladali prvky pri search
 
     // 4. test SEARCH myHash
     clock_t t5;
@@ -237,18 +240,18 @@ void kolizie_rotatice_random(int table_size){ // otestovanie kolizii aj časov, 
 
 
     // 6. test SEARCH AVL
-    clock_t t7;
-    t7= clock();
-
-    for (int i = 0; i < table_size; i++) {
-        //search_hash(array[i], &table_probing);
-        //search_chain(array[i]);
-        search(avl_root, array[i]);
-    }
-
-    t7 = clock() - t7;
-    double time_taken7 = ((double)t7)/CLOCKS_PER_SEC; // in seconds
-    printf("AVL search took: %f\n", time_taken7);
+   // clock_t t7;
+   // t7= clock();
+//
+   // for (int i = 0; i < table_size; i++) {
+   //     //search_hash(array[i], &table_probing);
+   //     //search_chain(array[i]);
+   //     search(avl_root, array[i]);
+   // }
+//
+   // t7 = clock() - t7;
+   // double time_taken7 = ((double)t7)/CLOCKS_PER_SEC; // in seconds
+   // printf("AVL search took: %f\n", time_taken7);
 
     printf("collision my hash: %d |  collision chain: %d | avl_rotation: %d \n", collision_my_hash, collision_chain, avl_rotation);
 
@@ -292,37 +295,63 @@ int main(int argc, char *argv[]) {
     srand(time(0)); // zabezpečuje aby vždy boli nahodne cisla kazdykrat co sa spusti program
 
 
-
-
-
     //timer_detection(test_sorted_nonrandom,"My hash probing", 0,  1000000, 200000000,1);
-    //timer_detection(test_sorted_nonrandom,"My hash probing", 0,  1000000, 200000000,2);
-    //timer_detection(test_sorted_nonrandom,"My hash probing", 0,  1000000, 200000000,3);
+    //timer_detection(test_sorted_nonrandom,"Chaining", 0,  1000000, 200000000,2);
+    //timer_detection(test_sorted_nonrandom,"AVL", 0,  1000000, 200000000,3);
 
 
     //timer_detection(test_sorted_nonrandom,"My hash probing", 1000000,  10000000, 200000000,1);
-    //timer_detection(test_sorted_nonrandom,"My hash probing", 1000000,  10000000, 200000000,2);
-    //timer_detection(test_sorted_nonrandom,"My hash probing", 1000000,  10000000, 200000000,3);
+    //timer_detection(test_sorted_nonrandom,"Chaining", 1000000,  10000000, 200000000,2);
+    //timer_detection(test_sorted_nonrandom,"AVL", 1000000,  10000000, 200000000,3);
 
     //timer_detection(test_sorted_nonrandom,"My hash probing", 0,  200000000, 200000000,1);
-    //timer_detection(test_sorted_nonrandom,"My hash probing", 0,  200000000, 200000000,2);
-    //timer_detection(test_sorted_nonrandom,"My hash probing", 0,  200000000, 200000000,3);
+    //timer_detection(test_sorted_nonrandom,"Chaining", 0,  200000000, 200000000,2);
+    //timer_detection(test_sorted_nonrandom,"AVL", 0,  200000000, 200000000,3);
 
     //timer_detection(test_sorted_nonrandom,"My hash probing", 1000000000,  1200000000, 200000000,1);
-    //timer_detection(test_sorted_nonrandom,"My hash probing", 1000000000,  1200000000, 200000000,2);
-    //timer_detection(test_sorted_nonrandom,"My hash probing", 1000000000,  1200000000, 200000000,3);
+    //timer_detection(test_sorted_nonrandom,"Chaining", 1000000000,  1200000000, 200000000,2);
+    //timer_detection(test_sorted_nonrandom,"AVL", 1000000000,  1200000000, 200000000,3);
 
     //timer_detection(test_sorted_nonrandom,"My hash probing", 10000000,  100000000, 200000000,1);
-    //timer_detection(test_sorted_nonrandom,"My hash probing", 10000000,  100000000, 200000000,2);
-    //timer_detection(test_sorted_nonrandom,"My hash probing", 10000000,  100000000, 200000000,3);
+    //timer_detection(test_sorted_nonrandom,"Chaining", 10000000,  100000000, 200000000,2);
+    //timer_detection(test_sorted_nonrandom,"AVL", 10000000,  100000000, 200000000,3);
 
+    // povodne to bolo takto
     //kolizie_rotatice_random(1997);
     //kolizie_rotatice_random(25000);
-    //kolizie_rotatice_random(50000);
-    kolizie_rotatice_random(100000);
-    //kolizie_rotatice_random(150000);
+    //kolizie_rotatice_random(50000,50000);
+    //kolizie_rotatice_random(100000);
+    //kolizie_rotatice_random(500000,500051);
     //kolizie_rotatice_random(200000);
-    //kolizie_rotatice_random(250000);
+    //kolizie_rotatice_random(250000,250000);
+
+    // nove upravene
+    // povodne to bolo takto
+    //kolizie_rotatice_random(1997,200000000);
+    //kolizie_rotatice_random(25000,200000000);
+    //kolizie_rotatice_random(50000,200000000);
+    //kolizie_rotatice_random(100000,200000000);
+    //kolizie_rotatice_random(150000,200000000);
+    //kolizie_rotatice_random(200000,200000000);
+    //kolizie_rotatice_random(250000,200000000);
+    //kolizie_rotatice_random(500000,200000000);
+
+    struct Node* avl_root = NULL;
+    avl_root = insert(avl_root, 10);
+    avl_root = insert(avl_root, 7);
+    avl_root = insert(avl_root, 3);
+    avl_root = insert(avl_root, 6);
+    avl_root = insert(avl_root, 5);
+    avl_root = insert(avl_root, 9);
+    avl_root = insert(avl_root, 13);
+    avl_root = insert(avl_root, 12);
+    avl_root = insert(avl_root, 11);
+    avl_root = insert(avl_root, 4);
+    avl_root = insert(avl_root, 1);
+//
+    print2D(avl_root);
+
+
 
 
     //test_my_hashmap_functionality();
